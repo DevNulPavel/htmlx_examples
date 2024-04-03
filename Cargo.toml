@@ -1,0 +1,19 @@
+############################################################################
+
+[workspace]
+resolver = "2"
+members = [
+    "test_1"
+]
+
+############################################################################
+
+[workspace.dependencies]
+# Common
+thiserror = "^1.0.57"
+
+# Tokio
+tokio = { version = "^1.36.0", default-features = false, features = ["full"] }
+
+# Templates
+askama = "^0.12.1"
