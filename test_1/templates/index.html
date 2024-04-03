@@ -1,0 +1,21 @@
+<html>
+
+<head>
+    <title>Title</title>
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <h1>Test title</h1>
+    {{ name }}
+
+    <br>
+
+    <button hx-post="/clicked" hx-swap="outerHTML">
+        Click Me
+    </button>
+</body>
+
+</html>
