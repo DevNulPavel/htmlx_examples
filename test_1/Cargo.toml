@@ -12,10 +12,14 @@ edition = "2021"
 [dependencies]
 # Common dependencies
 thiserror = { workspace = true }
+uuid = { version = "^1.8.0", features = ["v4"] }
 
 # Tokio
 tokio = { workspace = true }
 tokio-util = { workspace = true }
+
+# Serde
+serde = { version = "^1.0.197", features = ["derive"] }
 
 # API
 warp = { workspace = true }
