@@ -1,12 +1,41 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- HTMX script -->
     <script src="https://unpkg.com/htmx.org@1.9.11"
         integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
         crossorigin="anonymous"></script>
+
+    <title>HTMX</title>
 </head>
 
+<body style="width: 400px; margin: 2rem auto;">
+    <!-- Main page link -->
+    <div>
+        <a href="/">Main page</a>
+    </div>
+
+    <br>
+
+    <!-- Body template -->
+    {% block body %}{% endblock %}
+</body>
+
+</html>
+
+<!-- ---------------------------------------------------------------------------------------- -->
+
+<!-- 
+</html>
+<html>
+<head>
+    <title>Title</title>
+    
+</head>
 <body>
     <h1>Test title</h1>
     {{ name }}
@@ -18,4 +47,4 @@
     </button>
 </body>
 
-</html>
+</html> -->

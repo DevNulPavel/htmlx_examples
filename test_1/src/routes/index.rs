@@ -1,3 +1,10 @@
+use crate::error::CommonError;
+use askama::Template;
+use warp::{
+    http::{response::Response, StatusCode},
+    hyper::body::Body,
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Template)]
@@ -6,7 +13,7 @@ struct IndexTemplate<'a> {
     name: &'a str,
 }
 
-async fn process_index() -> Result<warp::reply::Response, CommonError> {
+pub(crate) async fn process_index() -> Result<warp::reply::Response, CommonError> {
     let index = IndexTemplate { name: "Test name" };
 
     let output = index.render()?;

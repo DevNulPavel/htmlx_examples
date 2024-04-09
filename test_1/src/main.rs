@@ -1,19 +1,20 @@
 mod error;
+mod event;
 mod routes;
+mod user;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-use crate::error::CommonError;
-use askama::Template;
+use self::routes::{get_user::process_get_user, index::process_index};
+use routes::event::{process_event, EventParams};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use uuid::Uuid;
 use warp::{
     filters::{
+        body::form,
         method::{get, post},
-        path::{end, path},
+        path::{end, param, path},
     },
-    http::{response::Response, StatusCode},
-    hyper::body::Body,
     reject::Rejection,
     serve, Filter,
 };
@@ -29,27 +30,22 @@ async fn main() {
 
     // Роутинг для получения HTML конкретного юзера
     let user = path("user")
-        .and(warp::path::param::<Uuid>())
+        .and(param::<Uuid>())
         .and(get())
         .and_then(
             |user_id| async move { process_get_user(user_id).await.map_err(Rejection::from) },
         );
 
-    // TODO
+    // Обработка ивента
     let event = path("event")
         .and(post())
-        .and(warp::filters::body::form())
+        .and(form::<EventParams>())
         .and_then(|event_params| async move {
-            process_get_user(user_id).await.map_err(Rejection::from)
+            process_event(event_params).await.map_err(Rejection::from)
         });
 
-    // Роутинг для корневого корня страницы
-    let clicked = path("clicked")
-        .and(post())
-        .and_then(|| async { process_clicked().await.map_err(Rejection::from) });
-
     // Собранные в кучу все роутинги
-    let routes = index.or(user).or(clicked);
+    let routes = index.or(user).or(event);
 
     // Адрес сервера для биндинга
     let server_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 8080));

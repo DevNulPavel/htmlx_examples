@@ -1,2 +1,43 @@
+{% extends "index.html" %}
 
-{{ name }}
+{% block body %}
+
+<!-- Имя юзера в самом верху -->
+<h3>{{ user.user_name }}</h3>
+
+<h5>User events</h5>
+
+<!-- Список ивентов юзера -->
+<!-- <ul class="events_list">
+    {% include "events.html" %}
+</ul> -->
+
+<!-- Горизонтальная прямая -->
+<hr />
+
+<h5>Add event</h5>
+
+<form action="/event/">
+    <!-- Поле ввода имени -->
+    <div>
+        <input type="text" name="name" required placeholder="Event name">
+    </div>
+
+    <br />
+
+    <!-- Поле ввода даты -->
+    <div>
+        <input type="date" name="date" placeholder="Event date" id="date">
+    </div>
+
+    <!-- Скрытые поля для сохранения данных в шаблоне и последующей передачи в event -->
+    <input type="hidden" name="user_uuid" value="{{ user.uuid }}">
+    <input type="hidden" name="uuid" value="">
+
+    <br />
+
+    <!-- Кнопка выполнения запроса формы -->
+    <button>Add</button>
+</form>
+
+{% endblock %}
