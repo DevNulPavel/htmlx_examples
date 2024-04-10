@@ -1,8 +1,5 @@
-use std::str::FromStr;
-
-use crate::error::CommonError;
+use crate::{error::CommonError, user::User};
 use askama::Template;
-use chrono::{DateTime, Utc};
 use non_empty_string::NonEmptyString;
 use uuid::Uuid;
 use warp::{
@@ -22,6 +19,9 @@ pub(crate) async fn process_get_user(user_id: Uuid) -> Result<warp::reply::Respo
     let index = GetUserTemplate {
         user: User {
             user_name: NonEmptyString::new(String::from("test")).unwrap(),
+            name: NonEmptyString::new(String::from("test")).unwrap(),
+            uuid: Uuid::new_v4(),
+            events: Vec::new(),
         },
     };
 

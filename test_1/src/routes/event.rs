@@ -1,4 +1,4 @@
-use crate::error::CommonError;
+use crate::{error::CommonError, event::Event};
 use askama::Template;
 use non_empty_string::NonEmptyString;
 use uuid::Uuid;
@@ -11,8 +11,8 @@ use warp::{
 
 #[derive(Template)]
 #[template(path = "events.html")]
-struct EventTemplate<'a> {
-    name: &'a str,
+struct EventTemplate {
+    events: Vec<Event>,
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ pub(crate) struct EventParams {
 pub(crate) async fn process_event(
     event_params: EventParams,
 ) -> Result<warp::reply::Response, CommonError> {
-    let index = EventTemplate { name: "Test name" };
+    let index = EventTemplate { events: Vec::new() };
 
     let output = index.render()?;
 

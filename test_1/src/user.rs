@@ -1,11 +1,12 @@
+use crate::event::Event;
 use non_empty_string::NonEmptyString;
 use uuid::Uuid;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 pub(crate) struct User {
-    uuid: Uuid,
-    user_name: NonEmptyString,
-    // name: NonEmptyString,
-    // events: Vec<Event>,
+    pub(crate) uuid: Uuid,
+    pub(crate) user_name: NonEmptyString,
+    pub(crate) name: NonEmptyString,
+    pub(crate) events: Vec<Event>,
 }

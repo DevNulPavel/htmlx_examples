@@ -18,11 +18,11 @@
     <div>
         <a href="/">Main page</a>
     </div>
-
     <br>
 
-    <!-- Body template -->
-    {% block body %}{% endblock %}
+    {% block body -%}
+    <div>Empty content</div>
+    {%- endblock %}
 </body>
 
 </html>
@@ -38,7 +38,6 @@
 </head>
 <body>
     <h1>Test title</h1>
-    {{ name }}
 
     <br>
 

@@ -1,6 +1,10 @@
+<!-- Будем заменять контент в файлике index.html -->
 {% extends "index.html" %}
 
-{% block body %}
+<!--------------------------------------------------------------------------------->
+
+<!-- Указываем новое содержимое блока body в index.html -->
+{% block body -%}
 
 <!-- Имя юзера в самом верху -->
 <h3>{{ user.user_name }}</h3>
@@ -8,7 +12,9 @@
 <h5>User events</h5>
 
 <!-- Список ивентов юзера -->
-<!-- <ul class="events_list">
+<ul class="events_list">
+    <!-- Вставляем сюда другой шаблон events.html -->
+    {% set events = user.events|as_ref %}
     {% include "events.html" %}
 </ul> -->
 
@@ -17,6 +23,7 @@
 
 <h5>Add event</h5>
 
+<!-- Форма со списком событий -->
 <form action="/event/">
     <!-- Поле ввода имени -->
     <div>
@@ -40,4 +47,4 @@
     <button>Add</button>
 </form>
 
-{% endblock %}
+{%- endblock %}
