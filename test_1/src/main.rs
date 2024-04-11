@@ -1,12 +1,11 @@
+mod data;
 mod error;
-mod event;
 mod routes;
-mod user;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 use self::routes::{get_user::process_get_user, index::process_index};
-use routes::event::{process_event, EventParams};
+use routes::event::{process_event, NewEventParams};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use uuid::Uuid;
 use warp::{
@@ -39,7 +38,7 @@ async fn main() {
     // Обработка ивента
     let event = path("event")
         .and(post())
-        .and(form::<EventParams>())
+        .and(form::<NewEventParams>())
         .and_then(|event_params| async move {
             process_event(event_params).await.map_err(Rejection::from)
         });

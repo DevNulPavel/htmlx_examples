@@ -25,14 +25,15 @@
 
 ########################################################################
 
-BUILD: _FMT_CHECK_CLIPPY
-    cargo build
+BUILD target: _FMT_CHECK_CLIPPY
+    cargo build --bin {{ target }}
 
-BUILD_RELEASE: _FMT_CHECK_CLIPPY_RELEASE
+BUILD_RELEASE target: _FMT_CHECK_CLIPPY_RELEASE
     cargo build \
-        --release
+        --release \
+        --bin {{ target }}
 
 ########################################################################
 
-RUN: BUILD
+RUN_TEST_1: (BUILD "test_1")
     {{justfile_directory()}}/target/debug/test_1

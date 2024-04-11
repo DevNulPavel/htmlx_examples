@@ -1,4 +1,4 @@
-use crate::{error::CommonError, user::User};
+use crate::{data::user::User, error::CommonError};
 use askama::Template;
 use non_empty_string::NonEmptyString;
 use uuid::Uuid;
@@ -15,13 +15,15 @@ struct GetUserTemplate {
     user: User,
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 pub(crate) async fn process_get_user(user_id: Uuid) -> Result<warp::reply::Response, CommonError> {
     let index = GetUserTemplate {
         user: User {
             user_name: NonEmptyString::new(String::from("test")).unwrap(),
-            name: NonEmptyString::new(String::from("test")).unwrap(),
             uuid: Uuid::new_v4(),
             events: Vec::new(),
+            // name: NonEmptyString::new(String::from("test")).unwrap(),
         },
     };
 
