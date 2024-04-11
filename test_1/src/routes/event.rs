@@ -1,4 +1,4 @@
-use crate::{data::event::Event, error::CommonError};
+use crate::{context::Context, data::event::Event, error::CommonError};
 use askama::Template;
 use non_empty_string::NonEmptyString;
 use uuid::Uuid;
@@ -27,8 +27,9 @@ pub(crate) struct NewEventParams {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-pub(crate) async fn process_event(
+pub(crate) async fn process_new_event(
     event_params: NewEventParams,
+    context: &Context,
 ) -> Result<warp::reply::Response, CommonError> {
     let index = EventsTemplate { events: Vec::new() };
 

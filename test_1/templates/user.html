@@ -7,7 +7,7 @@
 {% block body -%}
 
 <!-- Имя юзера в самом верху -->
-<h3>{{ user.user_name }}</h3>
+<h3>{{ user.name }}</h3>
 
 <h5>User events</h5>
 
@@ -19,7 +19,7 @@
 </ul> -->
 
 <!-- Горизонтальная прямая -->
-<hr />
+<hr>
 
 <h5>Add event</h5>
 
@@ -27,21 +27,25 @@
 <form action="/event/">
     <!-- Поле ввода имени -->
     <div>
-        <input type="text" name="name" required placeholder="Event name">
+        <input type="text" id="event_name" name="event_name" placeholder="Event name" required>
     </div>
 
-    <br />
+    <br>
 
     <!-- Поле ввода даты -->
     <div>
-        <input type="date" name="date" placeholder="Event date" id="date">
+        <input type="date" id="event_date" name="event_date" placeholder="Event date" required>
     </div>
 
     <!-- Скрытые поля для сохранения данных в шаблоне и последующей передачи в event -->
+    
+    <!-- Идентификатор нового события -->
+    <input type="hidden" name="event_uuid" value="">
+    
+    <!-- Идентификатор текущего пользователя для связи -->
     <input type="hidden" name="user_uuid" value="{{ user.uuid }}">
-    <input type="hidden" name="uuid" value="">
 
-    <br />
+    <br>
 
     <!-- Кнопка выполнения запроса формы -->
     <button>Add</button>
