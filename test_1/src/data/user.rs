@@ -4,6 +4,7 @@ use uuid::Uuid;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+#[derive(Debug)]
 pub(crate) struct User {
     pub(crate) uuid: Uuid,
     pub(crate) name: NonEmptyString,

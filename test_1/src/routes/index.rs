@@ -1,6 +1,10 @@
 use crate::{context::Context, data::user::User, error::CommonError};
 use askama::Template;
-use std::sync::Arc;
+use std::{
+    fs::File,
+    io::BufReader,
+    sync::{Arc, PoisonError},
+};
 use warp::{
     http::{response::Response, StatusCode},
     hyper::body::Body,
@@ -10,18 +14,20 @@ use warp::{
 
 #[derive(Template)]
 #[template(path = "users.html")]
-struct IndexTemplate {
-    users: Vec<User>,
+struct IndexTemplate<'a> {
+    users: &'a [User],
 }
 
 pub(crate) async fn process_index(context: &Context) -> Result<warp::reply::Response, CommonError> {
-    let users_content = std::fs::read_to_string(context.users_file_path)?;
+    let output = {
+        let users = context.users.lock();
 
-    // serde_json::fr
+        let index = IndexTemplate {
+            users: users.as_ref(),
+        };
 
-    let index = IndexTemplate {};
-
-    let output = index.render()?;
+        index.render()?
+    };
 
     let response = Response::builder()
         .status(StatusCode::OK)

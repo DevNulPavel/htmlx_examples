@@ -16,8 +16,15 @@ use self::{
     },
 };
 use clap::Parser;
+use data::{event::Event, user::User};
+use error::CommonError;
+use parking_lot::Mutex;
 use std::{
+    borrow::Borrow,
+    fs::File,
+    io::BufReader,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+    path::Path,
     sync::Arc,
 };
 use uuid::Uuid;
@@ -27,6 +34,8 @@ use warp::{
         method::{get, post},
         path::{end, param, path},
     },
+    http::{response::Response, status::StatusCode},
+    hyper::body::Body,
     reject::Rejection,
     serve, Filter,
 };
@@ -39,10 +48,18 @@ async fn main() {
     let args = AppArgs::parse();
 
     // Создадим из параметров теперь контекст, который мы будем шарить
-    let context = Arc::new(Context {
-        events_file_path: args.events_file_path,
-        users_file_path: args.users_file_path,
-    });
+    let context = {
+        // Грузим юзеров
+        let users = load_users(&args.users_file_path).expect("users_loading");
+
+        // Создаем контекст общий
+        let context = Context {
+            users: Mutex::new(users),
+        };
+
+        // Arc для потоков
+        Arc::new(context)
+    };
 
     // Роутинг для корневого корня страницы
     let index = end().and(get()).and_then({
@@ -98,6 +115,23 @@ async fn main() {
             }
         });
 
+    // Отдача статики скрипта
+    let script_data = path("static/htmlx_1.9.11.js").and(get()).map(|| {
+        // Статические данные в бинарнике
+        let script_data = include_str!("../static/htmlx_1.9.11.js");
+
+        // Тело
+        let body = Body::from(script_data);
+
+        // Сам ответ, можем позволить здесь себе unwrap, так как данные статические
+        Response::builder()
+            .status(StatusCode::OK)
+            .body(body)
+            .unwrap()
+    });
+
+    // TODO: Добавить условную компрессию при наличии заголовков в запросе
+
     // Собранные в кучу все роутинги
     let routes = index.or(user).or(event);
 
@@ -114,10 +148,40 @@ async fn main() {
         })
         .expect("Server spawn problem");
 
+    // Адрес сервера
     println!("Server address: 'http://{}'", server_bind_address);
 
     // Возвращаем футуру ожидания завершения работы сервера выше
     spawned_server_future.await;
+
+    // Здесь после завершения работы сервера должен остаться лишь один Arc-контекст
+    let context = Arc::into_inner(context).expect("context_last_arc");
+
+    // Получаем назад юзеров
+    let users = context.users.into_inner();
+
+    // После завершения работы снова сохраняем данные в файлик
+    save_users(users, &args.users_file_path).expect("users_save");
+
+    println!("Users saved");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+fn load_users(users_file_path: &Path) -> Result<Vec<User>, CommonError> {
+    /* // Для этого примера достаточно простого синхронного чтения файлика, вообще без изысков.
+    let reader = {
+        let file = File::open(args.users_file_path)?;
+        BufReader::new(file)
+    };
+
+    let users = serde_json::from_reader::<Vec<User>>(reader)?; */
+
+    todo!()
+}
+
+fn save_users(users: impl AsRef<[User]>, users_file_path: &Path) -> Result<(), CommonError> {
+    todo!()
 }
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////

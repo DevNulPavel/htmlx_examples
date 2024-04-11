@@ -945,6 +945,7 @@ dependencies = [
  "chrono",
  "clap",
  "non-empty-string",
+ "parking_lot",
  "serde",
  "serde_json",
  "thiserror",

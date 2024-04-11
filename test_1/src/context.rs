@@ -1,9 +1,8 @@
-use std::path::PathBuf;
+use crate::data::user::User;
+use parking_lot::Mutex;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 pub(crate) struct Context {
-    pub(crate) users_file_path: PathBuf,
-
-    pub(crate) events_file_path: PathBuf,
+    pub(crate) users: Mutex<Vec<User>>,
 }

@@ -9,6 +9,9 @@ pub(crate) enum CommonError {
 
     #[error("warp body -> {0}")]
     WarpBody(#[from] warp::http::Error),
+
+    #[error("IO -> {0}")]
+    IO(#[from] std::io::Error),
 }
 
 impl Reject for CommonError {}
