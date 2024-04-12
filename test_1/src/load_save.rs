@@ -1,13 +1,15 @@
 use crate::{data::user::User, error::CommonError};
 use std::{
+    collections::BTreeMap,
     fs::File,
     io::{BufWriter, Read},
     path::Path,
 };
+use uuid::Uuid;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-pub(crate) fn load_users(users_file_path: &Path) -> Result<Vec<User>, CommonError> {
+pub(crate) fn load_users(users_file_path: &Path) -> Result<BTreeMap<Uuid, User>, CommonError> {
     // Для этого примера достаточно простого синхронного чтения файлика, вообще без изысков.
     let file_data = {
         // Откроем файлик, проверим его существование
@@ -43,14 +45,20 @@ pub(crate) fn load_users(users_file_path: &Path) -> Result<Vec<User>, CommonErro
     };
 
     // Парсим данные из оперативки, это быстрее, чем из reader
-    let users = serde_json::from_slice::<Vec<User>>(&file_data)?;
+    let users_local = serde_json::from_slice::<Vec<User>>(&file_data)?;
+
+    // Конвертируем в дерево
+    let users: BTreeMap<Uuid, User> = users_local.into_iter().map(|i| (i.uuid, i)).collect();
 
     Ok(users)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-pub(crate) fn save_users(users: Vec<User>, users_file_path: &Path) -> Result<(), CommonError> {
+pub(crate) fn save_users(
+    users: BTreeMap<Uuid, User>,
+    users_file_path: &Path,
+) -> Result<(), CommonError> {
     // Создадим директорию для файлика если ее не существует еще.
     // затем содзадим временный файлик.
     // Для относительных путей в текущей директории возвращается Some("")
@@ -70,8 +78,11 @@ pub(crate) fn save_users(users: Vec<User>, users_file_path: &Path) -> Result<(),
     // Создаем обертку для буферизации
     let mut file_writer = BufWriter::new(temp_file);
 
+    // Конвертируем в вектор значений для сохранения
+    let users_vec: Vec<User> = users.into_values().collect();
+
     // Запишем сохранение
-    serde_json::to_writer_pretty(&mut file_writer, &users)?;
+    serde_json::to_writer_pretty(&mut file_writer, &users_vec)?;
 
     // Возвращаем назад файлик для атомарной замены
     // Здесь не будем сохранять в ошибке непосредтвенно сам writer, оставим лишь IO ошибку

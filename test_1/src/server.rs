@@ -36,11 +36,9 @@ pub(crate) fn build_warp_server(
     let index = end().and(get()).and_then({
         // Клон для лямбды
         let context = context.clone();
-
         move || {
             // Клон для футуры
             let context = context.clone();
-
             async move {
                 process_index(context.as_ref())
                     .await
@@ -50,14 +48,12 @@ pub(crate) fn build_warp_server(
     });
 
     // Роутинг для получения HTML конкретного юзера
-    let user = path("user").and(param::<Uuid>()).and(get()).and_then({
+    let user = path("user_page").and(param::<Uuid>()).and(get()).and_then({
         // Клон для лямбды
         let context = context.clone();
-
         move |user_id| {
             // Клон для футуры
             let context = context.clone();
-
             async move {
                 process_get_user(user_id, context.as_ref())
                     .await
@@ -67,17 +63,15 @@ pub(crate) fn build_warp_server(
     });
 
     // Обработка ивента
-    let event = path("event")
+    let event = path("new_event")
         .and(post())
         .and(form::<NewEventParams>())
         .and_then({
             // Клон для лямбды
             let context = context.clone();
-
             move |event_params| {
                 // Клон для футуры
                 let context = context.clone();
-
                 async move {
                     process_new_event(event_params, context.as_ref())
                         .await

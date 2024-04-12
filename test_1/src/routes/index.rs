@@ -9,8 +9,11 @@ use warp::{
 
 #[derive(Template)]
 #[template(path = "users.html")]
-struct IndexTemplate<'a> {
-    users: &'a [User],
+struct IndexTemplate<'a, I>
+where
+    I: Iterator<Item = &'a User>,
+{
+    users: I,
 }
 
 /// Обработка отдачи корневой странички
@@ -22,7 +25,7 @@ pub(crate) async fn process_index(context: &Context) -> Result<warp::reply::Resp
 
         // Создаем шаблон
         let index = IndexTemplate {
-            users: users.as_ref(),
+            users: users.values(),
         };
 
         // рендерим результат

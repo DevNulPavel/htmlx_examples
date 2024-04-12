@@ -19,7 +19,7 @@ struct EventsTemplate {
 
 #[derive(Debug, serde::Deserialize)]
 pub(crate) struct NewEventParams {
-    event_uuid: Uuid,
+    // event_uuid: Uuid,
     name: NonEmptyString,
     date: NonEmptyString,
     user_uuid: Uuid,

@@ -12,7 +12,7 @@ edition = "2021"
 [dependencies]
 # Common dependencies
 thiserror = { workspace = true }
-uuid = { version = "^1.8.0", features = ["v4", "serde"] }
+uuid = { version = "^1.8.0", features = ["v7", "serde"] }
 non-empty-string = { version = "^0.2.4", features = ["serde"] }
 chrono = { version = "^0.4.37", features = ["serde"] }
 clap = { version = "^4.5.4", features = ["derive"] }

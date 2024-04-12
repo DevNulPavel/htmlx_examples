@@ -14,7 +14,7 @@
 <!-- Список ивентов юзера -->
 <ul class="events_list">
     <!-- Вставляем сюда другой шаблон events.html -->
-    {% set events = user.events|as_ref %}
+    {% set events = user.events.values() %}
     {% include "events.html" %}
 </ul>
 
@@ -24,7 +24,7 @@
 <h5>Add event</h5>
 
 <!-- Форма со списком событий -->
-<form action="/event/">
+<form action="/new_event">
     <!-- Поле ввода имени -->
     <div>
         <input type="text" id="event_name" name="event_name" placeholder="Event name" required>
@@ -40,7 +40,7 @@
     <!-- Скрытые поля для сохранения данных в шаблоне и последующей передачи в event -->
     
     <!-- Идентификатор нового события -->
-    <input type="hidden" name="event_uuid" value="">
+    <!-- <input type="hidden" name="event_uuid" value=""> -->
     
     <!-- Идентификатор текущего пользователя для связи -->
     <input type="hidden" name="user_uuid" value="{{ user.uuid }}">

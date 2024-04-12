@@ -11,9 +11,15 @@ use warp::{
 
 #[derive(Template)]
 #[template(path = "user.html")]
-struct GetUserTemplate {
-    user: User,
+struct GetUserTemplate<'a> {
+    user: &'a User,
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+#[derive(Template)]
+#[template(path = "not_found.html")]
+struct NotFound {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -21,6 +27,11 @@ pub(crate) async fn process_get_user(
     user_id: Uuid,
     context: &Context,
 ) -> Result<warp::reply::Response, CommonError> {
+    {
+        let users = context.users.lock();
+
+        users.get(value)
+    }
     let index = GetUserTemplate {
         user: User {
             name: NonEmptyString::new(String::from("test")).unwrap(),
