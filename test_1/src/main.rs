@@ -1,4 +1,5 @@
 mod args;
+mod cancellation;
 mod context;
 mod data;
 mod error;
@@ -10,6 +11,7 @@ mod server;
 
 use crate::{
     args::AppArgs,
+    cancellation::{spawn_gracefull_shutdown, ShutdownTokens},
     context::Context,
     load_save::{load_users, save_users},
     server::build_warp_server,
@@ -39,14 +41,28 @@ async fn main() {
         Arc::new(context)
     };
 
+    let ShutdownTokens {
+        cancelation_grace,
+        cancelation_force,
+    } = spawn_gracefull_shutdown();
+
     // Создаем и настраиваем сервер
-    let (server_bind_address, spawned_server_future) = build_warp_server(&context);
+    let (server_bind_address, spawned_server_future) =
+        build_warp_server(&context, cancelation_grace);
 
     // Адрес сервера
     println!("Server address: 'http://{}'", server_bind_address);
 
     // Возвращаем футуру ожидания завершения работы сервера выше
-    spawned_server_future.await;
+    // TODO: Force shutdown support
+    tokio::select! {
+        _ = spawned_server_future => {
+            println!("Server finished");
+        }
+        _ = cancelation_force.cancelled() => {
+            println!("Server FORCE finished");
+        }
+    }
 
     // Здесь после завершения работы сервера должен остаться лишь один Arc-контекст
     let context = Arc::into_inner(context).expect("context_last_arc");

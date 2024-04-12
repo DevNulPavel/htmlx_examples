@@ -20,8 +20,6 @@ pub(crate) async fn process_index(context: &Context) -> Result<warp::reply::Resp
         // Берем короткую блокировку
         let users = context.users.lock();
 
-        dbg!(&users);
-
         // Создаем шаблон
         let index = IndexTemplate {
             users: users.as_ref(),

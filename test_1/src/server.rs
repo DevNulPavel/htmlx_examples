@@ -11,6 +11,7 @@ use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     sync::Arc,
 };
+use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 use warp::{
     filters::{
@@ -27,7 +28,10 @@ use warp::{
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Создаем и настраиваем сервер
-pub(crate) fn build_warp_server(context: &Arc<Context>) -> (SocketAddr, impl Future<Output = ()>) {
+pub(crate) fn build_warp_server(
+    context: &Arc<Context>,
+    cancellation_grace: CancellationToken,
+) -> (SocketAddr, impl Future<Output = ()>) {
     // Роутинг для корневого корня страницы
     let index = end().and(get()).and_then({
         // Клон для лямбды
@@ -82,12 +86,10 @@ pub(crate) fn build_warp_server(context: &Arc<Context>) -> (SocketAddr, impl Fut
             }
         });
 
-    // Отдача статики скрипта
-    let script_data = path("static")
-        .and(path("htmlx_1.9.11.js"))
-        .and(end())
-        .and(get())
-        .map(|| {
+    // Отдача статики
+    let static_data = {
+        // Скрипт
+        let script_data = path("htmlx_1.9.11.js").and(end()).and(get()).map(|| {
             // Статические данные в бинарнике
             let script_data = include_str!("../static/htmlx_1.9.11.js");
 
@@ -101,10 +103,29 @@ pub(crate) fn build_warp_server(context: &Arc<Context>) -> (SocketAddr, impl Fut
                 .unwrap()
         });
 
+        // Скрипт
+        let style_data = path("style.css").and(end()).and(get()).map(|| {
+            // Статические данные в бинарнике
+            let script_data = include_str!("../static/style.css");
+
+            // Тело
+            let body = Body::from(script_data);
+
+            // Сам ответ, можем позволить здесь себе unwrap, так как данные статические
+            Response::builder()
+                .status(StatusCode::OK)
+                .body(body)
+                .unwrap()
+        });
+
+        // Общее начало static + другие пути
+        path("static").and(script_data.or(style_data))
+    };
+
     // TODO: Добавить условную компрессию при наличии заголовков в запросе
 
     // Собранные в кучу все роутинги
-    let routes = index.or(user).or(event).or(script_data);
+    let routes = index.or(user).or(event).or(static_data);
 
     // Адрес сервера для биндинга
     let server_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));
@@ -113,9 +134,7 @@ pub(crate) fn build_warp_server(context: &Arc<Context>) -> (SocketAddr, impl Fut
     let (server_bind_address, spawned_server_future) = serve(routes)
         .try_bind_with_graceful_shutdown(server_address, async move {
             // Дожидаемся завершения нажатия CTRL-C
-            tokio::signal::ctrl_c().await.expect("CTRL-C processing");
-
-            println!("SIGINT signal received");
+            cancellation_grace.cancelled().await;
         })
         .expect("Server spawn problem");
 
