@@ -11,7 +11,7 @@ use warp::{
 #[template(path = "users.html")]
 struct IndexTemplate<'a, I>
 where
-    I: Iterator<Item = &'a User>,
+    I: Iterator<Item = &'a User> + Clone,
 {
     users: I,
 }

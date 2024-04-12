@@ -1,6 +1,6 @@
 use crate::data::event::Event;
 use non_empty_string::NonEmptyString;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use uuid::Uuid;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

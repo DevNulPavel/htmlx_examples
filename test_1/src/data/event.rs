@@ -18,7 +18,7 @@ pub(crate) struct Event {
     pub(crate) date: DateTime<Utc>,
 }
 
-// Реализуем сравнения чисто только по UUID
+/* // Реализуем сравнения чисто только по UUID
 impl PartialEq<Event> for Event {
     fn eq(&self, other: &Event) -> bool {
         self.uuid.eq(&other.uuid)
@@ -39,4 +39,4 @@ impl Ord for Event {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.uuid.cmp(&other.uuid)
     }
-}
+} */
