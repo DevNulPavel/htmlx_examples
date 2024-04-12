@@ -14,9 +14,10 @@ edition = "2021"
 thiserror = { workspace = true }
 uuid = { version = "^1.8.0", features = ["v4", "serde"] }
 non-empty-string = { version = "^0.2.4", features = ["serde"] }
-chrono = "^0.4.37"
+chrono = { version = "^0.4.37", features = ["serde"] }
 clap = { version = "^4.5.4", features = ["derive"] }
 parking_lot = "^0.12.1"
+tempfile = "^3.10.0"
 
 # Tokio
 tokio = { workspace = true }

@@ -12,6 +12,15 @@ pub(crate) enum CommonError {
 
     #[error("IO -> {0}")]
     IO(#[from] std::io::Error),
+
+    #[error("serde json -> {0}")]
+    SerdeJson(#[from] serde_json::Error),
+
+    #[error("persist error -> {0}")]
+    TempfilePersist(#[from] tempfile::PersistError),
+
+    #[error("into inner -> {0}")]
+    IntoInner(std::io::Error),
 }
 
 impl Reject for CommonError {}
