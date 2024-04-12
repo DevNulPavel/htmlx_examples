@@ -83,19 +83,23 @@ pub(crate) fn build_warp_server(context: &Arc<Context>) -> (SocketAddr, impl Fut
         });
 
     // Отдача статики скрипта
-    let script_data = path("static/htmlx_1.9.11.js").and(get()).map(|| {
-        // Статические данные в бинарнике
-        let script_data = include_str!("../static/htmlx_1.9.11.js");
+    let script_data = path("static")
+        .and(path("htmlx_1.9.11.js"))
+        .and(end())
+        .and(get())
+        .map(|| {
+            // Статические данные в бинарнике
+            let script_data = include_str!("../static/htmlx_1.9.11.js");
 
-        // Тело
-        let body = Body::from(script_data);
+            // Тело
+            let body = Body::from(script_data);
 
-        // Сам ответ, можем позволить здесь себе unwrap, так как данные статические
-        Response::builder()
-            .status(StatusCode::OK)
-            .body(body)
-            .unwrap()
-    });
+            // Сам ответ, можем позволить здесь себе unwrap, так как данные статические
+            Response::builder()
+                .status(StatusCode::OK)
+                .body(body)
+                .unwrap()
+        });
 
     // TODO: Добавить условную компрессию при наличии заголовков в запросе
 

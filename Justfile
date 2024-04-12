@@ -36,4 +36,5 @@ BUILD_RELEASE target: _FMT_CHECK_CLIPPY_RELEASE
 ########################################################################
 
 RUN_TEST_1: (BUILD "test_1")
-    {{justfile_directory()}}/target/debug/test_1
+    {{justfile_directory()}}/target/debug/test_1 \
+        --users-file-path "{{justfile_directory()}}/test_1/data_samples/users.json"

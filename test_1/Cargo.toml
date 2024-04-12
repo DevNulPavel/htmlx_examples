@@ -18,6 +18,7 @@ chrono = { version = "^0.4.37", features = ["serde"] }
 clap = { version = "^4.5.4", features = ["derive"] }
 parking_lot = "^0.12.1"
 tempfile = "^3.10.0"
+cast = { version = "^0.3.0", features = ["std"] }
 
 # Tokio
 tokio = { workspace = true }

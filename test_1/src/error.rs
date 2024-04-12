@@ -19,6 +19,9 @@ pub(crate) enum CommonError {
     #[error("persist error -> {0}")]
     TempfilePersist(#[from] tempfile::PersistError),
 
+    #[error("cast -> {0}")]
+    Cast(#[from] cast::Error),
+
     #[error("into inner -> {0}")]
     IntoInner(std::io::Error),
 }
