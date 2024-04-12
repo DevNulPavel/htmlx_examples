@@ -16,6 +16,8 @@ where
     users: I,
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 /// Обработка отдачи корневой странички
 pub(crate) async fn process_index(context: &Context) -> Result<warp::reply::Response, CommonError> {
     // Формируем ответ от сервера

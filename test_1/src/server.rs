@@ -1,7 +1,7 @@
 use crate::{
     context::Context,
     routes::{
-        event::{process_new_event, NewEventParams},
+        new_event::{process_new_event, NewEventParams},
         get_user::process_get_user,
         index::process_index,
     },
