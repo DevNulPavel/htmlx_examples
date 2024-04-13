@@ -1,7 +1,7 @@
 use crate::{
     context::Context,
     error::CommonError,
-    templates::{NotFoundPage, UserPage},
+    templates::{pages::NotFoundPage, parts::EventsList},
 };
 use askama::Template;
 use uuid::Uuid;
@@ -12,7 +12,7 @@ use warp::{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-pub(crate) async fn process_get_user(
+pub(crate) async fn process_events_list(
     user_id: Uuid,
     context: &Context,
 ) -> Result<warp::reply::Response, CommonError> {
@@ -23,15 +23,13 @@ pub(crate) async fn process_get_user(
 
         match get_user_res {
             Some(user) => {
-                let index = UserPage {
-                    user,
-                    message: None,
+                let index = EventsList {
+                    events: user.events.values(),
                 };
                 index.render()?
             }
             None => {
                 drop(users_lock);
-
                 let index = NotFoundPage {};
                 index.render()?
             }

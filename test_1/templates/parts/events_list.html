@@ -1,0 +1,12 @@
+<!-- Вставляем сюда другой шаблон events.html -->
+<!-- {$ set events = user.events.values() %}} -->
+<!-- {$ include "events.html" %}} -->
+
+<!-- List item -->
+{% for event in events.clone() %}
+<!-- List item -->
+<li>
+    <!-- жирный + курсив -->
+    <b>{{ event.name }}</b> - <i>{{ crate::helpers::utc_time_to_naive_moscow(event.date.clone()) }}</i>
+</li>
+{% endfor %}

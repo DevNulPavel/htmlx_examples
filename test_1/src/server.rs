@@ -2,9 +2,11 @@ use crate::{
     context::Context,
     error::CommonError,
     routes::{
-        get_user::process_get_user,
-        index::process_index,
+        events_list::process_events_list,
         new_event::{process_new_event, NewEventParams},
+        user_page::process_user_page,
+        users_list::process_users_list,
+        users_page::process_users_page,
     },
 };
 use std::{
@@ -33,53 +35,85 @@ pub(crate) fn build_warp_server(
     context: &Arc<Context>,
     cancellation_grace: CancellationToken,
 ) -> (SocketAddr, impl Future<Output = ()>) {
-    // Роутинг для корневого корня страницы
-    let index = end().and(get()).and_then({
-        // Клон для лямбды
-        let context = context.clone();
-        move || {
-            // Клон для футуры
-            let context = context.clone();
-            async move {
-                process_index(context.as_ref())
-                    .await
-                    .map_err(Rejection::from)
-            }
-        }
-    });
+    let pages = {
+        // Роутинг для корневого корня страницы
+        let index_page = end()
+            .and(get())
+            .and_then(|| async { process_users_page().await.map_err(Rejection::from) });
 
-    // Роутинг для получения HTML конкретного юзера
-    let user = path("user_page").and(param::<Uuid>()).and(get()).and_then({
-        // Клон для лямбды
-        let context = context.clone();
-        move |user_id| {
-            // Клон для футуры
-            let context = context.clone();
-            async move {
-                process_get_user(user_id, context.as_ref())
-                    .await
-                    .map_err(Rejection::from)
-            }
-        }
-    });
-
-    // Обработка ивента
-    let event = path("new_event")
-        .and(post())
-        .and(form::<NewEventParams>())
-        .and_then({
+        // Роутинг для получения HTML конкретного юзера
+        let user_page = path("user_page").and(param::<Uuid>()).and(get()).and_then({
             // Клон для лямбды
             let context = context.clone();
-            move |event_params| {
+            move |user_id| {
                 // Клон для футуры
                 let context = context.clone();
                 async move {
-                    process_new_event(event_params, context.as_ref())
+                    process_user_page(user_id, context.as_ref())
                         .await
                         .map_err(Rejection::from)
                 }
             }
         });
+
+        // Обработка ивента
+        let new_event = path("new_event")
+            .and(post())
+            .and(form::<NewEventParams>())
+            .and_then({
+                // Клон для лямбды
+                let context = context.clone();
+                move |event_params| {
+                    // Клон для футуры
+                    let context = context.clone();
+                    async move {
+                        process_new_event(event_params, context.as_ref())
+                            .await
+                            .map_err(Rejection::from)
+                    }
+                }
+            });
+
+        index_page.or(user_page).or(new_event)
+    };
+
+    let parts = {
+        // Роутинг для получения HTML конкретного юзера
+        let users_list = path("users_list").and(get()).and_then({
+            // Клон для лямбды
+            let context = context.clone();
+            move || {
+                // Клон для футуры
+                let context = context.clone();
+                async move {
+                    process_users_list(context.as_ref())
+                        .await
+                        .map_err(Rejection::from)
+                }
+            }
+        });
+
+        // Роутинг для получения HTML конкретного юзера
+        let events_list = path("events_list")
+            .and(param::<Uuid>())
+            .and(get())
+            .and_then({
+                // Клон для лямбды
+                let context = context.clone();
+                move |user_id| {
+                    // Клон для футуры
+                    let context = context.clone();
+                    async move {
+                        process_events_list(user_id, context.as_ref())
+                            .await
+                            .map_err(Rejection::from)
+                    }
+                }
+            });
+
+        // Общее начало static + другие пути
+        path("parts").and(users_list.or(events_list))
+    };
 
     // Отдача статики
     let static_data = {
@@ -120,11 +154,7 @@ pub(crate) fn build_warp_server(
     // TODO: Добавить условную компрессию при наличии заголовков в запросе
 
     // Собранные в кучу все роутинги
-    let routes = index
-        .or(user)
-        .or(event)
-        .or(static_data)
-        .recover(handle_rejection);
+    let routes = pages.or(parts).or(static_data).recover(handle_rejection);
 
     // Адрес сервера для биндинга
     let server_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));

@@ -1,0 +1,5 @@
+{% for user in users.clone() %}
+<li>
+    <a href="/user_page/{{ user.uuid }}">{{ user.name }}</a>
+</li>
+{% endfor %}

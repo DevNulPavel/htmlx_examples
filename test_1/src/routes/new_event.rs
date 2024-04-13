@@ -3,7 +3,7 @@ use crate::{
     data::event::Event,
     error::CommonError,
     helpers::naive_moscow_time_to_utc,
-    templates::{ErrorPage, NotFoundPage, UserPage},
+    templates::pages::{ErrorPage, NotFoundPage, UserPage},
 };
 use askama::Template;
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -20,9 +20,13 @@ use warp::{
 
 #[derive(Debug, serde::Deserialize)]
 pub(crate) struct NewEventParams {
+    /// Идентификатор юзера, куда мы добавляем данные
     user_uuid: Uuid,
+
+    /// Имя нового события
     event_name: NonEmptyString,
 
+    /// Дата события
     #[serde(deserialize_with = "deserialize_time")]
     event_date: DateTime<Utc>,
 }
