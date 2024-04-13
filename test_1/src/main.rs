@@ -20,7 +20,7 @@ use crate::{
 };
 use clap::Parser;
 use parking_lot::Mutex;
-use std::sync::Arc;
+use std::{ops::Deref, sync::Arc};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -66,14 +66,23 @@ async fn main() {
         }
     }
 
-    // Здесь после завершения работы сервера должен остаться лишь один Arc-контекст
-    let context = Arc::into_inner(context).expect("context_last_arc");
+    // Здесь после завершения работы сервера должен остаться лишь один Arc-контекст,
+    // но для принудительного завершения сделаем поддержку еще и сохранения по ссылке
+    match Arc::try_unwrap(context) {
+        Ok(context) => {
+            // Получаем назад юзеров
+            let users = context.users.into_inner();
 
-    // Получаем назад юзеров
-    let users = context.users.into_inner();
+            // После завершения работы снова сохраняем данные в файлик
+            save_users(users, &args.users_file_path).expect("users_save");
+        }
+        Err(context) => {
+            let users_lock = context.users.lock();
 
-    // После завершения работы снова сохраняем данные в файлик
-    save_users(users, &args.users_file_path).expect("users_save");
+            // После завершения работы снова сохраняем данные в файлик
+            save_users(users_lock.deref(), &args.users_file_path).expect("users_save");
+        }
+    }
 
     println!("Users saved");
 }

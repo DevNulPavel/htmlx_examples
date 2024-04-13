@@ -2,11 +2,21 @@
 <!-- {$ set events = user.events.values() %}} -->
 <!-- {$ include "events.html" %}} -->
 
+<!-- Таким образом мы можем заменить какой-то там элемент вообще в другом месте -->
+<!-- obsidian://open?vault=notes&file=Notes%2FIT%2FHTMX -->
+{% if let Some(message) = message %}
+<div id="message" hx-swap-oob="true">{{ message }}</div>
+{% endif %}
+
 <!-- List item -->
 {% for event in events.clone() %}
 <!-- List item -->
 <li>
     <!-- жирный + курсив -->
-    <b>{{ event.name }}</b> - <i>{{ crate::helpers::utc_time_to_naive_moscow(event.date.clone()) }}</i>
+    <b>{{ event.name }}</b> -
+    <i>{{ crate::helpers::utc_time_to_naive_moscow(event.date.clone()) }}</i>
+    <br>
+    <button hx-post="/parts/remove_event"
+        hx-params="user_uuid:{{ user_uuid }}&event_uuid:{{ event.uuid }}">Remove</button>
 </li>
 {% endfor %}

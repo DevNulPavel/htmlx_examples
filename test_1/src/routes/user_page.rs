@@ -23,10 +23,7 @@ pub(crate) async fn process_user_page(
 
         match get_user_res {
             Some(user) => {
-                let index = UserPage {
-                    user,
-                    message: None,
-                };
+                let index = UserPage { user };
                 index.render()?
             }
             None => {

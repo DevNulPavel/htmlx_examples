@@ -1,5 +1,6 @@
 use crate::{data::user::User, error::CommonError};
 use std::{
+    borrow::Borrow,
     collections::BTreeMap,
     fs::File,
     io::{BufWriter, Read},
@@ -53,7 +54,7 @@ pub(crate) fn load_users(users_file_path: &Path) -> Result<BTreeMap<Uuid, User>,
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 pub(crate) fn save_users(
-    users: BTreeMap<Uuid, User>,
+    users: impl Borrow<BTreeMap<Uuid, User>>,
     users_file_path: &Path,
 ) -> Result<(), CommonError> {
     // Создадим директорию для файлика если ее не существует еще.
@@ -76,7 +77,7 @@ pub(crate) fn save_users(
     let mut file_writer = BufWriter::new(temp_file);
 
     // Запишем сохранение
-    serde_json::to_writer_pretty(&mut file_writer, &users)?;
+    serde_json::to_writer_pretty(&mut file_writer, users.borrow())?;
 
     // Возвращаем назад файлик для атомарной замены
     // Здесь не будем сохранять в ошибке непосредтвенно сам writer, оставим лишь IO ошибку

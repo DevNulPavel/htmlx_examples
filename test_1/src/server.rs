@@ -4,6 +4,7 @@ use crate::{
     routes::{
         events_list::process_events_list,
         new_event::{process_new_event, NewEventParams},
+        remove_event::{process_remove_event, RemoveEventParams},
         user_page::process_user_page,
         users_list::process_users_list,
         users_page::process_users_page,
@@ -56,25 +57,7 @@ pub(crate) fn build_warp_server(
             }
         });
 
-        // Обработка ивента
-        let new_event = path("new_event")
-            .and(post())
-            .and(form::<NewEventParams>())
-            .and_then({
-                // Клон для лямбды
-                let context = context.clone();
-                move |event_params| {
-                    // Клон для футуры
-                    let context = context.clone();
-                    async move {
-                        process_new_event(event_params, context.as_ref())
-                            .await
-                            .map_err(Rejection::from)
-                    }
-                }
-            });
-
-        index_page.or(user_page).or(new_event)
+        index_page.or(user_page)
     };
 
     let parts = {
@@ -111,8 +94,44 @@ pub(crate) fn build_warp_server(
                 }
             });
 
+        // Обработка добавления ивента
+        let new_event = path("new_event")
+            .and(post())
+            .and(form::<NewEventParams>())
+            .and_then({
+                // Клон для лямбды
+                let context = context.clone();
+                move |event_params| {
+                    // Клон для футуры
+                    let context = context.clone();
+                    async move {
+                        process_new_event(event_params, context.as_ref())
+                            .await
+                            .map_err(Rejection::from)
+                    }
+                }
+            });
+
+        // Обработка удаления ивента
+        let remove_event = path("remove_event")
+            .and(post())
+            .and(form::<RemoveEventParams>())
+            .and_then({
+                // Клон для лямбды
+                let context = context.clone();
+                move |event_params| {
+                    // Клон для футуры
+                    let context = context.clone();
+                    async move {
+                        process_remove_event(event_params, context.as_ref())
+                            .await
+                            .map_err(Rejection::from)
+                    }
+                }
+            });
+
         // Общее начало static + другие пути
-        path("parts").and(users_list.or(events_list))
+        path("parts").and(users_list.or(events_list).or(new_event).or(remove_event))
     };
 
     // Отдача статики

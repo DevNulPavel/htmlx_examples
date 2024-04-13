@@ -24,6 +24,9 @@ pub(crate) enum CommonError {
 
     #[error("into inner -> {0}")]
     IntoInner(std::io::Error),
+
+    #[error("invalid id")]
+    InvalidId,
 }
 
 impl Reject for CommonError {}

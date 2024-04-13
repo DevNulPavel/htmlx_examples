@@ -1,5 +1,6 @@
 use crate::data::{event::Event, user::User};
 use askama::Template;
+use uuid::Uuid;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -16,10 +17,14 @@ where
 
 #[derive(Template)]
 #[template(path = "parts/events_list.html")]
-pub(crate) struct EventsList<'a, I>
+pub(crate) struct EventsList<'a, 'b, I>
 where
     I: Iterator<Item = &'a Event> + Clone,
 {
+    pub(crate) message: Option<&'b str>,
+
+    pub(crate) user_uuid: Uuid,
+
     pub(crate) events: I,
 }
 

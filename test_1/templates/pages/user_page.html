@@ -9,14 +9,12 @@
 <!-- Имя юзера в самом верху -->
 <h3>{{ user.name }}</h3>
 
-{% if let Some(message) = message %}
-<div> {{- message -}} </div>
-{% endif %}
-
 <h5>User events</h5>
 
+<div id="message"></div>
+
 <!-- Список ивентов юзера -->
-<ul hx-get="/parts/events_list/{{ user.uuid }}" hx-target="this" hx-swap="innerHTML" hx-trigger="load">
+<ul id="events_list" hx-get="/parts/events_list/{{ user.uuid }}" hx-target="this" hx-swap="innerHTML" hx-trigger="load">
 </ul>
 
 <!-- Горизонтальный разделитель -->
@@ -25,7 +23,7 @@
 <h5>Add event</h5>
 
 <!-- Форма со списком событий -->
-<form action="/new_event" method="post">
+<form hx-post="/parts/new_event" hx-target="#events_list" hx-swap="innerHTML" hx-trigger="submit">
     <!-- Поле ввода имени -->
     <div>
         <input type="text" id="event_name" name="event_name" placeholder="Event name" required>

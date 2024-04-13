@@ -1,9 +1,6 @@
 use crate::{
-    context::Context,
-    data::event::Event,
-    error::CommonError,
-    helpers::naive_moscow_time_to_utc,
-    templates::pages::{ErrorPage, NotFoundPage, UserPage},
+    context::Context, data::event::Event, error::CommonError, helpers::naive_moscow_time_to_utc,
+    templates::parts::EventsList,
 };
 use askama::Template;
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -38,16 +35,14 @@ pub(crate) async fn process_new_event(
     context: &Context,
 ) -> Result<warp::reply::Response, CommonError> {
     // Получаем страничку ответа
-    let output = 'output: {
+    let output = {
         // Короткая блокировка на юзерах
         let mut users_lock = context.users.lock();
 
         // Ищем нужного юзера
-        let Some(user) = users_lock.get_mut(&event_params.user_uuid) else {
-            drop(users_lock);
-            let index = NotFoundPage {};
-            break 'output index.render()?;
-        };
+        let user = users_lock
+            .get_mut(&event_params.user_uuid)
+            .ok_or(CommonError::InvalidId)?;
 
         // Создаем ключ для нового ивента
         let new_event_key = Uuid::now_v7();
@@ -67,17 +62,17 @@ pub(crate) async fn process_new_event(
                 vacant.insert(new_event);
 
                 // Создаем страничку юзера
-                let user_page = UserPage {
-                    user,
-                    message: Some("Event inserted"),
+                let user_page = EventsList {
+                    message: Some("event inserted"),
+                    user_uuid: event_params.user_uuid,
+                    events: user.events.values(),
                 };
 
                 user_page.render()?
             }
             // Почему-то оказался уже такой итем
             Entry::Occupied(_) => {
-                let index = ErrorPage {};
-                index.render()?
+                return Err(CommonError::InvalidId);
             }
         }
     };

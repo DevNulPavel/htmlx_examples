@@ -5,8 +5,7 @@ use askama::Template;
 
 #[derive(Template)]
 #[template(path = "pages/user_page.html")]
-pub(crate) struct UserPage<'a, 'b> {
-    pub(crate) message: Option<&'b str>,
+pub(crate) struct UserPage<'a> {
     pub(crate) user: &'a User,
 }
 
@@ -18,9 +17,9 @@ pub(crate) struct NotFoundPage {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#[derive(Template)]
-#[template(path = "pages/error_page.html")]
-pub(crate) struct ErrorPage {}
+// #[derive(Template)]
+// #[template(path = "pages/error_page.html")]
+// pub(crate) struct ErrorPage {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
