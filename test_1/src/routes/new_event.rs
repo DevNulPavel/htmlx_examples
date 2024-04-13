@@ -59,8 +59,10 @@ pub(crate) async fn process_new_event(
                     uuid: new_event_key,
                 };
 
+                // Добавляем событие
                 vacant.insert(new_event);
 
+                // Создаем страничку юзера
                 let user_page = UserPage {
                     user,
                     message: Some("Event inserted"),
