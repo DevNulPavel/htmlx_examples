@@ -1,24 +1,14 @@
-use crate::{context::Context, data::user::User, error::CommonError};
+use crate::{
+    context::Context,
+    error::CommonError,
+    templates::{NotFoundPage, UserPage},
+};
 use askama::Template;
 use uuid::Uuid;
 use warp::{
     http::{response::Response, StatusCode},
     hyper::body::Body,
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-#[derive(Template)]
-#[template(path = "user.html")]
-struct GetUserTemplate<'a> {
-    user: &'a User,
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-#[derive(Template)]
-#[template(path = "not_found.html")]
-struct NotFound {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -33,13 +23,16 @@ pub(crate) async fn process_get_user(
 
         match get_user_res {
             Some(user) => {
-                let index = GetUserTemplate { user };
+                let index = UserPage {
+                    user,
+                    message: None,
+                };
                 index.render()?
             }
             None => {
                 drop(users_lock);
 
-                let index = NotFound {};
+                let index = NotFoundPage {};
                 index.render()?
             }
         }

@@ -1,20 +1,9 @@
-use crate::{context::Context, data::user::User, error::CommonError};
+use crate::{context::Context, error::CommonError, templates::IndexPage};
 use askama::Template;
 use warp::{
     http::{response::Response, StatusCode},
     hyper::body::Body,
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-#[derive(Template)]
-#[template(path = "users.html")]
-struct IndexTemplate<'a, I>
-where
-    I: Iterator<Item = &'a User> + Clone,
-{
-    users: I,
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,7 +15,7 @@ pub(crate) async fn process_index(context: &Context) -> Result<warp::reply::Resp
         let users = context.users.lock();
 
         // Создаем шаблон
-        let index = IndexTemplate {
+        let index = IndexPage {
             users: users.values(),
         };
 

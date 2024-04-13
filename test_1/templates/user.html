@@ -9,6 +9,10 @@
 <!-- Имя юзера в самом верху -->
 <h3>{{ user.name }}</h3>
 
+{% if let Some(message) = message %}
+<div> {{- message -}} </div>
+{% endif %}
+
 <h5>User events</h5>
 
 <!-- Список ивентов юзера -->
@@ -24,7 +28,7 @@
 <h5>Add event</h5>
 
 <!-- Форма со списком событий -->
-<form action="/new_event">
+<form action="/new_event" method="post">
     <!-- Поле ввода имени -->
     <div>
         <input type="text" id="event_name" name="event_name" placeholder="Event name" required>
@@ -34,14 +38,14 @@
 
     <!-- Поле ввода даты -->
     <div>
-        <input type="date" id="event_date" name="event_date" placeholder="Event date" required>
+        <input type="datetime-local" id="event_date" name="event_date" placeholder="Event date" required>
     </div>
 
     <!-- Скрытые поля для сохранения данных в шаблоне и последующей передачи в event -->
-    
+
     <!-- Идентификатор нового события -->
     <!-- <input type="hidden" name="event_uuid" value=""> -->
-    
+
     <!-- Идентификатор текущего пользователя для связи -->
     <input type="hidden" name="user_uuid" value="{{ user.uuid }}">
 

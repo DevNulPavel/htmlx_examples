@@ -1,9 +1,10 @@
 use crate::{
     context::Context,
+    error::CommonError,
     routes::{
-        new_event::{process_new_event, NewEventParams},
         get_user::process_get_user,
         index::process_index,
+        new_event::{process_new_event, NewEventParams},
     },
 };
 use std::{
@@ -119,7 +120,11 @@ pub(crate) fn build_warp_server(
     // TODO: Добавить условную компрессию при наличии заголовков в запросе
 
     // Собранные в кучу все роутинги
-    let routes = index.or(user).or(event).or(static_data);
+    let routes = index
+        .or(user)
+        .or(event)
+        .or(static_data)
+        .recover(handle_rejection);
 
     // Адрес сервера для биндинга
     let server_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));
@@ -133,4 +138,85 @@ pub(crate) fn build_warp_server(
         .expect("Server spawn problem");
 
     (server_bind_address, spawned_server_future)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Кастомизация обработки различных отвалов в процессе обработки фильтра
+pub(super) async fn handle_rejection(
+    rej: Rejection,
+) -> Result<Response<Body>, std::convert::Infallible> {
+    // Нету такого метода
+    if rej.is_not_found() {
+        // Формируем результат, здесь он у нас точно валидный, так что можно unwrap
+        let r = warp::http::Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(warp::hyper::Body::empty())
+            .unwrap();
+
+        Ok(r)
+    }
+    // Конкретная какая-то ошибка
+    else if let Some(e) = rej.find::<CommonError>() {
+        // Сформируем body ответа, который содержит идентификатор этой самой ошибки в логах
+        // Здесь можем делать лишь unwrap
+        let body_str = error_json_string(e).unwrap();
+
+        // Формируем результат, здесь он у нас точно валидный, так что можно unwrap
+        let r = warp::http::Response::builder()
+            .status(StatusCode::BAD_REQUEST)
+            .body(warp::hyper::Body::from(body_str))
+            .unwrap();
+
+        Ok(r)
+    }
+    // Проблема c самим запросом
+    else if rej.find::<warp::reject::InvalidHeader>().is_some()
+        || rej.find::<warp::reject::InvalidQuery>().is_some()
+        || rej.find::<warp::reject::LengthRequired>().is_some()
+        || rej.find::<warp::reject::MethodNotAllowed>().is_some()
+    {
+        // Формируем результат, здесь он у нас точно валидный, так что можно unwrap
+        let r = warp::http::Response::builder()
+            .status(StatusCode::NOT_IMPLEMENTED)
+            .body(warp::hyper::Body::empty())
+            .unwrap();
+
+        Ok(r)
+    }
+    // Все остальное
+    else {
+        // Формируем результат, здесь он у нас точно валидный, так что можно unwrap
+        let r = warp::http::Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(warp::hyper::Body::empty())
+            .unwrap();
+
+        Ok(r)
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+fn error_json_string(err: impl std::error::Error) -> Result<String, serde_json::Error> {
+    // Сформируем body ответа, который содержит идентификатор этой самой ошибки в логах
+    /* let body_str = format_small!(
+       128,
+       r#"{{ "error_id": "{}", "error": "{}" }}"#,
+       error_id.as_u128(),
+       e.err
+    ); */
+
+    // Локальная структура, чтобы нормально кодировались строки в Json,
+    // так как там могут быть всякие символы не особо нужные.
+    #[derive(Debug, serde::Serialize)]
+    struct ErrResponse<'a> {
+        error: &'a str,
+    }
+
+    let err_str = format!("{}", err);
+
+    serde_json::to_string(&ErrResponse {
+        error: err_str.as_str(),
+    })
 }

@@ -23,7 +23,7 @@ pub(crate) enum CommonError {
     Cast(#[from] cast::Error),
 
     #[error("into inner -> {0}")]
-    IntoInner(std::io::Error)
+    IntoInner(std::io::Error),
 }
 
 impl Reject for CommonError {}

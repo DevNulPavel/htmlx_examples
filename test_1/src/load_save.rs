@@ -45,10 +45,7 @@ pub(crate) fn load_users(users_file_path: &Path) -> Result<BTreeMap<Uuid, User>,
     };
 
     // Парсим данные из оперативки, это быстрее, чем из reader
-    let users_local = serde_json::from_slice::<Vec<User>>(&file_data)?;
-
-    // Конвертируем в дерево
-    let users: BTreeMap<Uuid, User> = users_local.into_iter().map(|i| (i.uuid, i)).collect();
+    let users = serde_json::from_slice::<BTreeMap<Uuid, User>>(&file_data)?;
 
     Ok(users)
 }
@@ -78,11 +75,8 @@ pub(crate) fn save_users(
     // Создаем обертку для буферизации
     let mut file_writer = BufWriter::new(temp_file);
 
-    // Конвертируем в вектор значений для сохранения
-    let users_vec: Vec<User> = users.into_values().collect();
-
     // Запишем сохранение
-    serde_json::to_writer_pretty(&mut file_writer, &users_vec)?;
+    serde_json::to_writer_pretty(&mut file_writer, &users)?;
 
     // Возвращаем назад файлик для атомарной замены
     // Здесь не будем сохранять в ошибке непосредтвенно сам writer, оставим лишь IO ошибку

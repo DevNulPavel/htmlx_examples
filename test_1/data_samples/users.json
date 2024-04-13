@@ -1,13 +1,23 @@
-[
-  {
+{
+  "cb964a53-693c-413a-981c-a08cd0f79138": {
     "uuid": "{cb964a53-693c-413a-981c-a08cd0f79138}",
     "name": "Вася",
-    "events": [
-      {
+    "events": {
+      "018ed2e8-9af9-7b86-bce5-4b346f1b1ad2": {
+        "uuid": "{018ed2e8-9af9-7b86-bce5-4b346f1b1ad2}",
+        "name": "asdads",
+        "date": 1712935443
+      },
+      "018ed2e8-b60f-71c5-bdac-105cc27b3e8e": {
+        "uuid": "{018ed2e8-b60f-71c5-bdac-105cc27b3e8e}",
+        "name": "asdadaasd",
+        "date": 1712935450
+      },
+      "24f55821-877f-48ad-a2bf-af805afc2617": {
         "uuid": "{24f55821-877f-48ad-a2bf-af805afc2617}",
         "name": "Проверить работу",
         "date": 1712896366
       }
-    ]
+    }
   }
-]
+}
