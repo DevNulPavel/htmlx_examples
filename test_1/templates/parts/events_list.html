@@ -17,6 +17,8 @@
     <i>{{ crate::helpers::utc_time_to_naive_moscow(event.date.clone()) }}</i>
     <br>
     <button hx-post="/parts/remove_event"
-        hx-params="user_uuid:{{ user_uuid }}&event_uuid:{{ event.uuid }}">Remove</button>
+        hx-vals='{ "user_uuid": "{{ user_uuid }}", "event_uuid": "{{ event.uuid }}" }'>
+        Remove
+    </button>
 </li>
 {% endfor %}
