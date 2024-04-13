@@ -2,10 +2,11 @@ use crate::{
     context::Context,
     data::event::Event,
     error::CommonError,
+    helpers::naive_moscow_time_to_utc,
     templates::{ErrorPage, NotFoundPage, UserPage},
 };
 use askama::Template;
-use chrono::{DateTime, FixedOffset, NaiveDateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use non_empty_string::NonEmptyString;
 use serde::{Deserialize, Deserializer};
 use std::{borrow::Cow, collections::btree_map::Entry};
@@ -95,15 +96,8 @@ where
     let datetime_naive = NaiveDateTime::parse_from_str(datetime_str.as_ref(), "%Y-%m-%dT%H:%M")
         .map_err(serde::de::Error::custom)?;
 
-    // Будем считать, что время прилетает у нас московское, так что создаем смещение
-    let moscow_offset = FixedOffset::west_opt(60 * 60 * 3).unwrap();
-
     // Сначала создаем время с учетом смещения, конвертим потом в UTC
-    let datetime = datetime_naive
-        .and_local_timezone(moscow_offset)
-        .single()
-        .ok_or_else(|| serde::de::Error::custom("Invalid offset"))?
-        .to_utc();
+    let datetime = naive_moscow_time_to_utc(datetime_naive);
 
     Ok(datetime)
 }
