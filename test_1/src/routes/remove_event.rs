@@ -40,7 +40,7 @@ pub(crate) async fn process_remove_event(
 
         // Создаем страничку юзера
         let events_list = EventsList {
-            message: Some("event inserted"),
+            message: Some("Event removed"),
             user_uuid: event_params.user_uuid,
             events: user.events.values(),
         };
