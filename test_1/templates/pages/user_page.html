@@ -27,7 +27,8 @@
 <h5>Add event</h5>
 
 <!-- Форма со списком событий -->
-<form hx-post="/parts/new_event" hx-target="#events_list" hx-swap="innerHTML" hx-trigger="submit" hx-disable-elt="this">
+<form hx-post="/parts/new_event" hx-target="#events_list" hx-swap="innerHTML" hx-trigger="submit"
+  hx-disable-elt="#add_event_button">
   <!-- Поле ввода имени -->
   <div>
     <input type="text" id="event_name" name="event_name" placeholder="Event name" required />
@@ -51,7 +52,7 @@
   <br />
 
   <!-- Кнопка выполнения запроса формы -->
-  <button>
+  <button id="add_event_button">
     Add
     <img class="htmx-indicator button" src="/static/spinner.svg" hx-disable-elt="this" />
   </button>
