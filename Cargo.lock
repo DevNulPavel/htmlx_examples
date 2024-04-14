@@ -1011,6 +1011,7 @@ dependencies = [
  "cast",
  "chrono",
  "clap",
+ "mime",
  "non-empty-string",
  "parking_lot",
  "serde",

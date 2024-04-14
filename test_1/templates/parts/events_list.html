@@ -9,16 +9,20 @@
 {% endif %}
 
 <!-- List item -->
-{% for event in events.clone() %}
-<!-- List item -->
-<li>
+
+<ul>
+  {% for event in events.clone() %}
+  <!-- List item -->
+  <li>
     <!-- жирный + курсив -->
     <b>{{ event.name }}</b> -
     <i>{{ crate::helpers::utc_time_to_naive_moscow(event.date.clone()) }}</i>
-    <br>
-    <button hx-post="/parts/remove_event"
-        hx-vals='{ "user_uuid": "{{ user_uuid }}", "event_uuid": "{{ event.uuid }}" }'>
-        Remove
+    <br />
+
+    <button hx-post="/parts/remove_event" hx-vals='{ "user_uuid": "{{ user_uuid }}", "event_uuid": "{{ event.uuid }}" }'
+      hx-disable-elt="this">
+      Remove
     </button>
-</li>
-{% endfor %}
+  </li>
+  {% endfor %}
+</ul>

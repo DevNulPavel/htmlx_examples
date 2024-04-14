@@ -11,43 +11,50 @@
 
 <h5>User events</h5>
 
-<div id="message"></div>
-
 <!-- Список ивентов юзера -->
-<ul id="events_list" hx-get="/parts/events_list/{{ user.uuid }}" hx-target="this" hx-swap="innerHTML" hx-trigger="load">
-</ul>
+<div hx-get="/parts/events_list/{{ user.uuid }}" hx-target="#events_list" hx-swap="innerHTML" hx-trigger="load"
+  hx-indicator="#events_list_indicator">
+  <div id="message"></div>
+
+  <div id="events_list"></div>
+
+  <img id="events_list_indicator" class="htmx-indicator" src="/static/spinner.svg" />
+</div>
 
 <!-- Горизонтальный разделитель -->
-<hr>
+<hr />
 
 <h5>Add event</h5>
 
 <!-- Форма со списком событий -->
-<form hx-post="/parts/new_event" hx-target="#events_list" hx-swap="innerHTML" hx-trigger="submit">
-    <!-- Поле ввода имени -->
-    <div>
-        <input type="text" id="event_name" name="event_name" placeholder="Event name" required>
-    </div>
+<form hx-post="/parts/new_event" hx-target="#events_list" hx-swap="innerHTML" hx-trigger="submit" hx-disable-elt="this">
+  <!-- Поле ввода имени -->
+  <div>
+    <input type="text" id="event_name" name="event_name" placeholder="Event name" required />
+  </div>
 
-    <br>
+  <br />
 
-    <!-- Поле ввода даты -->
-    <div>
-        <input type="datetime-local" id="event_date" name="event_date" placeholder="Event date" required>
-    </div>
+  <!-- Поле ввода даты -->
+  <div>
+    <input type="datetime-local" id="event_date" name="event_date" placeholder="Event date" required />
+  </div>
 
-    <!-- Скрытые поля для сохранения данных в шаблоне и последующей передачи в event -->
+  <!-- Скрытые поля для сохранения данных в шаблоне и последующей передачи в event -->
 
-    <!-- Идентификатор нового события -->
-    <!-- <input type="hidden" name="event_uuid" value=""> -->
+  <!-- Идентификатор нового события -->
+  <!-- <input type="hidden" name="event_uuid" value=""> -->
 
-    <!-- Идентификатор текущего пользователя для связи -->
-    <input type="hidden" name="user_uuid" value="{{ user.uuid }}">
+  <!-- Идентификатор текущего пользователя для связи -->
+  <input type="hidden" name="user_uuid" value="{{ user.uuid }}" />
 
-    <br>
+  <br />
 
-    <!-- Кнопка выполнения запроса формы -->
-    <button>Add</button>
+  <!-- Кнопка выполнения запроса формы -->
+  <button>
+    Add
+    <img class="htmx-indicator button" src="/static/spinner.svg" hx-disable-elt="this" />
+  </button>
 </form>
 
 {%- endblock %}

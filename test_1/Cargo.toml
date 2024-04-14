@@ -19,6 +19,7 @@ clap = { version = "^4.5.4", features = ["derive"] }
 parking_lot = "^0.12.1"
 tempfile = "^3.10.0"
 cast = { version = "^0.3.0", features = ["std"] }
+mime = "^0.3.17"
 
 # Tokio
 tokio = { workspace = true }

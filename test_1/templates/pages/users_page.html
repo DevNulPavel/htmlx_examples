@@ -9,11 +9,25 @@
 <!-- Список ивентов юзера -->
 <!-- 
     - указываем, что делаем GET запрос на /users_list
-    - результат будем класть в this, 
-    - заменяться будет все содержимое целиком
+    - результат будем класть в дочерний users_list_container, 
+    - заменяться будет все содержимое целиком внутри
     - запрос будет стартовать после загрузки данного элемента на старницу
 -->
-<ul hx-get="/parts/users_list" hx-target="this" hx-swap="innerHTML" hx-trigger="load">
-</ul>
+<div
+  class="users_list"
+  hx-get="/parts/users_list"
+  hx-target="#users_list_container"
+  hx-swap="innerHTML"
+  hx-trigger="load"
+  hx-indicator="#users_list_indicator"
+>
+  <div id="users_list_container"></div>
+
+  <img
+    id="users_list_indicator"
+    class="htmx-indicator"
+    src="/static/spinner.svg"
+  />
+</div>
 
 {% endblock %}

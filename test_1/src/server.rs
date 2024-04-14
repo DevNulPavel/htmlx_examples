@@ -23,7 +23,11 @@ use warp::{
         method::{get, post},
         path::{end, param, path},
     },
-    http::{response::Response, status::StatusCode},
+    http::{
+        header::{HeaderValue, CONTENT_TYPE},
+        response::Response,
+        status::StatusCode,
+    },
     hyper::body::Body,
     reject::Rejection,
     serve, Filter,
@@ -140,34 +144,28 @@ pub(crate) fn build_warp_server(
         let script_data = path("htmlx_1.9.11.js").and(end()).and(get()).map(|| {
             // Статические данные в бинарнике
             let script_data = include_str!("../static/htmlx_1.9.11.js");
-
-            // Тело
-            let body = Body::from(script_data);
-
-            // Сам ответ, можем позволить здесь себе unwrap, так как данные статические
-            Response::builder()
-                .status(StatusCode::OK)
-                .body(body)
-                .unwrap()
+            valid_response_from_static_str(
+                script_data,
+                mime::APPLICATION_JAVASCRIPT_UTF_8.essence_str(),
+            )
         });
 
         // Скрипт
         let style_data = path("style.css").and(end()).and(get()).map(|| {
             // Статические данные в бинарнике
             let script_data = include_str!("../static/style.css");
+            valid_response_from_static_str(script_data, mime::TEXT_CSS_UTF_8.essence_str())
+        });
 
-            // Тело
-            let body = Body::from(script_data);
-
-            // Сам ответ, можем позволить здесь себе unwrap, так как данные статические
-            Response::builder()
-                .status(StatusCode::OK)
-                .body(body)
-                .unwrap()
+        // Спиннер
+        let spinner_data = path("spinner.svg").and(end()).and(get()).map(|| {
+            // Статические данные в бинарнике
+            let script_data = include_str!("../static/spinner.svg");
+            valid_response_from_static_str(script_data, mime::IMAGE_SVG.essence_str())
         });
 
         // Общее начало static + другие пути
-        path("static").and(script_data.or(style_data))
+        path("static").and(script_data.or(style_data).or(spinner_data))
     };
 
     // TODO: Добавить условную компрессию при наличии заголовков в запросе
@@ -187,6 +185,24 @@ pub(crate) fn build_warp_server(
         .expect("Server spawn problem");
 
     (server_bind_address, spawned_server_future)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Создаем из статической строки ответ
+fn valid_response_from_static_str(
+    script_data: &'static str,
+    content_type: &'static str,
+) -> Response<Body> {
+    // Тело
+    let body = Body::from(script_data);
+
+    // Сам ответ, можем позволить здесь себе unwrap, так как данные статические
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, HeaderValue::from_static(content_type))
+        .body(body)
+        .unwrap()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
