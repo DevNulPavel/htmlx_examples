@@ -1,3 +1,5 @@
 {
-    "liveServer.settings.root": "/test_1/html_pages"
+    "liveServer.settings.root": "/test_1/html_pages",
+    // "livePreview.serverRoot": "/Users/devnul/projects/htmx_examples/test_1/html_pages",
+    // "livePreview.openPreviewTarget": "External Browser"
 }
